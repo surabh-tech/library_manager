@@ -8,7 +8,7 @@ include("config.php");
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Query to fetch all registered students
     $query = "SELECT * FROM library.students_master";
-    $result = $conn->query($query);
+    $result = $con->query($query);
     
     // Prepare the response
     $response = array();
@@ -30,5 +30,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 // Close the MySQL connection
-$conn->close();
+$con->close();
 ?>
