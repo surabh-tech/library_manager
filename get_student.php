@@ -3,11 +3,13 @@
 include("config.php");
 
 // Check connection
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 // API endpoint to fetch all registered students
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Query to fetch all registered students
-    $query = "SELECT * FROM library.students_master";
+    $query = "SELECT * FROM library.student_master";
     $result = $con->query($query);
     
     // Prepare the response

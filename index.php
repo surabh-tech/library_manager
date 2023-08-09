@@ -1,51 +1,44 @@
-<?php
-// Set up MySQL connection
-include("config.php");
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Landing Page</title>
+    <!-- Include jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Welcome to the Landing Page</h1>
+    <button id="fetchStudentsBtn">Fetch Students</button>
+    <div id="studentList"></div>
 
-// Check connection
+    <script>
+        // Attach event listener to the button
+        $("#fetchStudentsBtn").click(function() {
+            // Perform an AJAX request to fetch students
+            $.ajax({
+                url: "get_student.php",
+                type: "GET",
+                dataType: "json",
+                success: function(response) {
+                    if (response.success) {
+                        // Display students in the "studentList" div
+                        var studentList = $("#studentList");
+                        studentList.empty(); // Clear previous content
 
-
-// Function to register a new student
-function registerStudent($id, $name, $branch, $conn)
-{
-    $sql = "INSERT INTO library.students_master (id, name, branch) VALUES (?, ?, ?)";
-    $stmt = $con->prepare($sql);
-    $stmt->bind_param("sss", $id, $name, $branch);
-    
-    if ($stmt->execute()) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-// API endpoint for student registration
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Retrieve data from the request
-    $id = $_POST['id'];
-    $name = $_POST['name'];
-    $branch = $_POST['branch'];
-
-    // Validate the data (You can add more validation if required)
-
-    // Register the student
-    $registrationStatus = registerStudent($id, $name, $branch, $conn);
-    
-    // Prepare the response
-    $response = array();
-    if ($registrationStatus) {
-        $response['success'] = true;
-        $response['message'] = "Student registered successfully!";
-    } else {
-        $response['success'] = false;
-        $response['message'] = "Failed to register student.";
-    }
-
-    // Send the JSON response
-    header('Content-Type: application/json');
-    echo json_encode($response);
-}
-
-// Close the MySQL connection
-$con->close();
-?>
+                        var students = response.students;
+                        for (var i = 0; i < students.length; i++) {
+                            var student = students[i];
+                            var studentInfo = "ID: " + student.id + "<br>Name: " + student.name + "<br>Branch: " + student.branch + "<br><br>";
+                            studentList.append(studentInfo);
+                        }
+                    } else {
+                        $("#studentList").text("Failed to fetch students.");
+                    }
+                },
+                error: function() {
+                    $("#studentList").text("An error occurred while fetching students.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
