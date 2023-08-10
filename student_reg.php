@@ -8,9 +8,9 @@ include("config.php");
 // Function to register a new student
 function registerStudent($id, $name, $branch, $conn)
 {
-    $sql = "INSERT INTO library.students_master (id, name, branch) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO library.students_master (sid, fname, lname, smob, status) VALUES (?, ?, ?, ?, ?)";
     $stmt = $con->prepare($sql);
-    $stmt->bind_param("sss", $id, $name, $branch);
+    $stmt->bind_param("ssssi", $sid, $fname, $lname, $smob, $status);
     
     if ($stmt->execute()) {
         return true;
@@ -22,16 +22,16 @@ function registerStudent($id, $name, $branch, $conn)
 // API endpoint for student registration
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve data from the request
-    $id = $_POST['id'];
-    $name = $_POST['name'];
-    $branch = $_POST['branch'];
+    $sid = $_POST['sid'];
+    $fname = $_POST['fname'];
+    $lname = $_POST['lname'];
+    $smob = $_POST['smob'];
+    $status = $_POST['status'];
 
-    // Validate the data (You can add more validation if required)
 
     // Register the student
-    $registrationStatus = registerStudent($id, $name, $branch, $conn);
+    $registrationStatus = registerStudent($sid, $fname, $lname, $smob, $status, $con);
     
-    // Prepare the response
     $response = array();
     if ($registrationStatus) {
         $response['success'] = true;

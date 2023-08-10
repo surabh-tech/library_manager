@@ -13,22 +13,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $result = $con->query($query);
     
     // Prepare the response
-    $response = array();
+    $students = array(); // Initialize the students array
     if ($result) {
-        $students = array();
         while ($row = $result->fetch_assoc()) {
             $students[] = $row;
         }
-        $response['success'] = true;
-        $response['students'] = $students;
     } else {
-        $response['success'] = false;
-        $response['message'] = "Failed to fetch students.";
+        // If failed to fetch students, you can include an error message if needed
+        $students = array();
+        $students['error'] = "Failed to fetch students.";
     }
 
     // Send the JSON response
     header('Content-Type: application/json');
-    echo json_encode($response);
+    echo json_encode($students); // Output only the students array
 }
 
 // Close the MySQL connection
