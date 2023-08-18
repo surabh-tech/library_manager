@@ -1,0 +1,26 @@
+1)tag_master
+attibutes
+1.id int PK 
+2.tname varchar(100)
+-------------------------------------------------------------------------------------
+2)tag_map
+tid int PK 
+tname varchar(100) 
+bid int 
+bname varchar(100)
+--------------------------------------------------------------------------------------
+3)book_master1
+id int AI PK 
+bname varchar(1000) 
+aname varchar(1000) 
+price varchar(50) 
+tag varchar(100)
+----------------------------------------------------------------------------
+4)student_master
+id int PK 
+sid varchar(100) 
+fname varchar(45) 
+lname varchar(45) 
+smob varchar(45) 
+status int
+-------------------------------------------------------------------------------
