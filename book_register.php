@@ -5,84 +5,85 @@ include("config.php");
 // Check connection
 
 // API endpoint to add a new book
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $bname = $_POST['bname'];
-    $aname = $_POST['aname'];
-    $price = $_POST['price'];
-    $tags = $_POST['tags'];
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $bname = $_GET['bname'];
+    $aname = $_GET['aname'];
+    $price = $_GET['price'];
+    $tags = $_GET['tags'];
 
     // Add book to book_master table
-    $insertBookQuery = "INSERT INTO library.book_master1 (bname, aname, price,tag) VALUES (?, ?, ?,?)";
+    $insertBookQuery = "INSERT INTO library.book_master1 (bname, aname, price) VALUES (?, ?, ?)";
     $stmt = $con->prepare($insertBookQuery);
-    // Prepare the statement
-$stmt = $con->prepare($insertBookQuery);
-if (!$stmt) {
-    echo "Prepare error: " . $con->error;
-} else {
-    // Bind the parameters
-    $stmt->bind_param("ssss", $bname, $aname, $price, $tags);
-
-    // Execute the statement
-    if ($stmt->execute()) {
-        echo "Book added successfully!";
+    if (!$stmt) {
+        echo "Prepare error: " . $con->error;
     } else {
-        echo "Execute error: " . $stmt->error;
-    }
+        // Bind the parameters
+        $stmt->bind_param("sss", $bname, $aname, $price);
 
-    // Close the statement
-   
-}
+        // Execute the statement
+        if ($stmt->execute()) {
+            $bookId = $stmt->insert_id;
 
-    $stmt->bind_param("ssss", $bname, $aname, $price,$tags);
+            // Process tags
+            $tagsArr = explode(",", $tags);
+            foreach ($tagsArr as $tag) {
+                $tag = trim($tag);
 
-    if ($stmt->execute()) {
-        $bookId = $stmt->insert_id;
+                if (!empty($tag)) {
+                    // Check if tag already exists in tag_master
+                    $tagId = getTagId($con, $tag);
 
-        // Insert tags into tag_master if not already present
-        $tagsArr = explode(",", $tags);
-        foreach ($tagsArr as $tag) {
-            $tag = trim($tag);
-            if (!empty($tag)) {
-                $insertTagQuery = "INSERT IGNORE INTO library.tag_master (tname) VALUES (?)";
-                $stmtTag = $con->prepare($insertTagQuery);
-                $stmtTag->bind_param("s", $tag);
-                $stmtTag->execute();
+                    // If tag doesn't exist, insert into tag_master
+                    if (!$tagId) {
+                        $tagId = insertTag($con, $tag);
+                    }
+
+                    // Insert tag association into tag_map
+                    if ($tagId) {
+                        insertTagMap($con, $tagId, $bookId);
+                    }
+                }
             }
+
+            echo "Book added successfully!";
+        } else {
+            echo "Execute error: " . $stmt->error;
         }
 
-        // Associate tags with the book in tag_map table
-        foreach ($tagsArr as $tag) {
-            $tag = trim($tag);
-            if (!empty($tag)) {
-                $selectTagIdQuery = "SELECT id FROM library.tag_master WHERE tname = ?";
-                $stmtSelectTagId = $con->prepare($selectTagIdQuery);
-                $stmtSelectTagId->bind_param("s", $tag);
-                $stmtSelectTagId->execute();
-                $stmtSelectTagId->bind_result($tagId);
-                $stmtSelectTagId->fetch();
-                $stmtSelectTagId->close();
-
-                $insertTagMapQuery = "INSERT INTO tag_map (tid, tname, bid, bname) VALUES (?, ?, ?, ?)";
-                $stmtTagMap = $con->prepare($insertTagMapQuery);
-                $stmtTagMap->bind_param("isss", $tagId, $tag, $bookId, $bname);
-                $stmtTagMap->execute();
-            }
-        }
-
-        // Prepare the response
-        $response = array();
-        $response['success'] = true;
-        $response['message'] = "Book added successfully!";
-    } else {
-        $response['success'] = false;
-        $response['message'] = "Failed to add book.";
+        // Close the statement
+        $stmt->close();
     }
 
-    // Send the JSON response
-    header('Content-Type: application/json');
-    echo json_encode($response);
+    // Close the MySQL connection
+    $con->close();
 }
 
-// Close the MySQL connection
-$con->close();
+function getTagId($con, $tag) {
+    $selectTagIdQuery = "SELECT id FROM library.tag_master WHERE tname = ?";
+    $stmt = $con->prepare($selectTagIdQuery);
+    $stmt->bind_param("s", $tag);
+    $stmt->execute();
+    $stmt->bind_result($tagId);
+    $stmt->fetch();
+    $stmt->close();
+    return $tagId;
+}
+
+function insertTag($con, $tag) {
+    $insertTagQuery = "INSERT INTO library.tag_master (tname) VALUES (?)";
+    $stmt = $con->prepare($insertTagQuery);
+    $stmt->bind_param("s", $tag);
+    $stmt->execute();
+    $tagId = $stmt->insert_id;
+    $stmt->close();
+    return $tagId;
+}
+
+function insertTagMap($con, $tagId, $bookId) {
+    $insertTagMapQuery = "INSERT INTO library.tag_map (tid, bid) VALUES (?, ?)";
+    $stmt = $con->prepare($insertTagMapQuery);
+    $stmt->bind_param("ii", $tagId, $bookId);
+    $stmt->execute();
+    $stmt->close();
+}
 ?>

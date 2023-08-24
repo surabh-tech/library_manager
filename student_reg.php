@@ -19,17 +19,14 @@ function registerStudent($id, $name, $branch, $conn)
     }
 }
 
-// API endpoint for student registration
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Retrieve data from the request
+    
     $sid = $_POST['sid'];
     $fname = $_POST['fname'];
     $lname = $_POST['lname'];
     $smob = $_POST['smob'];
     $status = $_POST['status'];
-
-
-    // Register the student
+    
     $registrationStatus = registerStudent($sid, $fname, $lname, $smob, $status, $con);
     
     $response = array();
