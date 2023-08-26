@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $bookId = $book['id'];
 
         // Retrieve associated tags for each book
-        $tagsQuery = "SELECT tname FROM library.tag_master INNER JOIN library.tag_map ON tag_master.id = tag_map.tid WHERE tag_map.bid = ?";
+        $tagsQuery = "SELECT tag_master.id, tname FROM library.tag_master INNER JOIN library.tag_map ON tag_master.id = tag_map.tid WHERE tag_map.bid = ?";
         $stmt = $con->prepare($tagsQuery);
         $stmt->bind_param("i", $bookId);
         $stmt->execute();
@@ -24,7 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         $tags = [];
         while ($tagRow = $tagsResult->fetch_assoc()) {
-            $tags[] = $tagRow['tname'];
+            $tags[] = array(
+                "id" => $tagRow['id'],
+                "name" => $tagRow['tname']
+            );
         }
 
         // Assign tags array to the book details
