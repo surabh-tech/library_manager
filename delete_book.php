@@ -4,39 +4,27 @@ include("config.php");
 
 // Check connection
 
-// API endpoint to delete a book by tag name
+// API endpoint to delete a book by ID
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $tagName = $_POST['tagName'];
+    $bookId = $_POST['bookId'];
 
-    // Get book IDs associated with the tag
-    $getBookIdsQuery = "SELECT DISTINCT tag_map.bid FROM library.tag_map INNER JOIN library.tag_master ON tag_map.tid = tag_master.id WHERE tag_master.tag_name = ?";
-    $stmt = $con->prepare($getBookIdsQuery);
-    $stmt->bind_param("s", $tagName);
+    // Delete tag associations from tag_map
+    $deleteTagMapQuery = "DELETE FROM library.tag_map WHERE bid = ?";
+    $stmt = $con->prepare($deleteTagMapQuery);
+    $stmt->bind_param("i", $bookId);
     $stmt->execute();
-    $bookIdsResult = $stmt->get_result();
+    $stmt->close();
 
-    while ($row = $bookIdsResult->fetch_assoc()) {
-        $bookId = $row['bid'];
-
-        // Delete tag associations from tag_map
-        $deleteTagMapQuery = "DELETE FROM library.tag_map WHERE bid = ?";
-        $stmt = $con->prepare($deleteTagMapQuery);
-        $stmt->bind_param("i", $bookId);
-        $stmt->execute();
-
-        // Delete book from book_master1
-        $deleteBookQuery = "DELETE FROM library.book_master1 WHERE id = ?";
-        $stmt = $con->prepare($deleteBookQuery);
-        $stmt->bind_param("i", $bookId);
-        $stmt->execute();
-    }
-
-    // Close the statements
+    // Delete book from book_master1
+    $deleteBookQuery = "DELETE FROM library.book_master1 WHERE id = ?";
+    $stmt = $con->prepare($deleteBookQuery);
+    $stmt->bind_param("i", $bookId);
+    $stmt->execute();
     $stmt->close();
 
     // Close the MySQL connection
     $con->close();
 
-    echo "Books with tag '$tagName' and their associated data deleted successfully!";
+    echo "Book with ID '$bookId' and its associated data deleted successfully!";
 }
 ?>
