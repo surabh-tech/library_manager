@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tagName = $_POST['tagName'];
 
     // Get book IDs associated with the tag
-    $getBookIdsQuery = "SELECT DISTINCT tag_map.bid FROM library.tag_map INNER JOIN library.tag_master ON tag_map.tid = tag_master.id WHERE tag_master.tname = ?";
+    $getBookIdsQuery = "SELECT DISTINCT tag_map.bid FROM library.tag_map INNER JOIN library.tag_master ON tag_map.tid = tag_master.id WHERE tag_master.tag_name = ?";
     $stmt = $con->prepare($getBookIdsQuery);
     $stmt->bind_param("s", $tagName);
     $stmt->execute();
