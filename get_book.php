@@ -4,21 +4,18 @@ include("config.php");
 
 // Check connection
 
-// API endpoint to get book details and associated tags
+// API endpoint to get details of all books and their associated tags
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $bookId = $_GET['bookId'];
+    // Retrieve all books
+    $selectAllBooksQuery = "SELECT * FROM library.book_master1";
+    $allBooksResult = $con->query($selectAllBooksQuery);
 
-    // Retrieve book details
-    $selectBookQuery = "SELECT * FROM library.book_master1 WHERE id = ?";
-    $stmt = $con->prepare($selectBookQuery);
-    $stmt->bind_param("i", $bookId);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $books = [];
 
-    if ($result->num_rows > 0) {
-        $book = $result->fetch_assoc();
+    while ($book = $allBooksResult->fetch_assoc()) {
+        $bookId = $book['id'];
 
-        // Retrieve associated tags
+        // Retrieve associated tags for each book
         $tagsQuery = "SELECT tname FROM library.tag_master INNER JOIN library.tag_map ON tag_master.id = tag_map.tid WHERE tag_map.bid = ?";
         $stmt = $con->prepare($tagsQuery);
         $stmt->bind_param("i", $bookId);
@@ -30,22 +27,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $tags[] = $tagRow['tname'];
         }
 
-        // Assign tags array to book details
+        // Assign tags array to the book details
         $book['tags'] = $tags;
 
-        // Close the statements
-        $stmt->close();
-
-        // Close the MySQL connection
-        $con->close();
-
-        // Return the data as JSON
-        header('Content-Type: application/json');
-        echo json_encode($book);
-    } else {
-        // Book not found
-        http_response_code(404);
-        echo json_encode(array("message" => "Book not found."));
+        // Add the book details to the array
+        $books[] = $book;
     }
+
+    // Close the statements
+    $stmt->close();
+
+    // Close the MySQL connection
+    $con->close();
+
+    // Return the data as JSON
+    header('Content-Type: application/json');
+    echo json_encode($books);
 }
 ?>
