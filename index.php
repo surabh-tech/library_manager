@@ -1,24 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Book</title>
+    <title>Test Student Registration</title>
 </head>
 <body>
-    <h2>Add a New Book</h2>
-    <form action="book_register.php" method="get">
-        <label for="bname">Book Title:</label>
-        <input type="text" id="bname" name="bname" required><br><br>
 
-        <label for="aname">Author Name:</label>
-        <input type="text" id="aname" name="aname" required><br><br>
+<h2>Test Student Registration</h2>
 
-        <label for="price">Price:</label>
-        <input type="number" id="price" name="price" step="0.01" required><br><br>
+<form action="student_reg.php" method="POST">
+    Student ID: <input type="text" name="sid" required><br><br>
+    First Name: <input type="text" name="fname" required><br><br>
+    Last Name: <input type="text" name="lname" required><br><br>
+    Mobile Number: <input type="text" name="smob" required><br><br>
+    Status: <input type="text" name="status" required><br><br>
+    <input type="submit" value="Register">
+</form>
 
-        <label for="tags">Tags (comma-separated):</label>
-        <input type="text" id="tags" name="tags"><br><br>
-
-        <input type="submit" value="Add Book">
-    </form>
 </body>
 </html>

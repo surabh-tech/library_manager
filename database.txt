@@ -24,3 +24,8 @@ lname varchar(45)
 smob varchar(45) 
 status int
 -------------------------------------------------------------------------------
+5)login_master
+id int AI PK 
+stud_id varchar(45) 
+password varchar(45) 
+token varchar(45)
