@@ -19,13 +19,13 @@ function studentLogin($stud_id, $password, $con)
 
     if ($result->num_rows === 1) {
         $row = $result->fetch_assoc();
-        if (password_verify($password, $row['password'])) {
+        if ($password === $row['password']) {
             // Student login is valid, generate JWT token
             $secret_key = "your_secret_key"; // Change this to your own secret key
             $payload = array(
                 "stud_id" => $stud_id
             );
-            $token = JWT::encode($payload, $secret_key);
+            $token = JWT::encode($payload, $secret_key, 'HS256'); // Use appropriate algorithm
 
             // Update login_master table with the generated token
             $updateTokenQuery = "UPDATE login_master SET token = ? WHERE stud_id = ?";
