@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student Login</title>
+    <title>Book Like and Suggestions</title>
 </head>
 <body>
-    <h1>Student Login</h1>
-    <form action="login.php" method="post">
-        <label for="stud_id">Student ID:</label>
-        <input type="text" id="stud_id" name="stud_id" required><br><br>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br><br>
-
-        <button type="submit">Login</button>
+    <h1>Book Like and Suggestions</h1>
+    
+    <form id="likeForm" method="post" action="suggestion.php">
+        <label for="token">Token:</label>
+        <input type="text" id="token" name="token"><br><br>
+        
+        <label for="bookId">Book ID:</label>
+        <input type="text" id="bookId" name="bookId"><br><br>
+        
+        <input type="submit" value="Like Book">
     </form>
+    
+    <h2>Suggested Books:</h2>
+    <ul id="suggestionsList">
+        <!-- Suggestions will be displayed here -->
+    </ul>
 </body>
 </html>
