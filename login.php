@@ -49,9 +49,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $response = array();
     if ($token) {
+        // Retrieve student details
+        $retrieveStudentQuery = "SELECT sid,fname, lname, smob FROM library.student_master WHERE sid = ?";
+        $stmtRetrieveStudent = $con->prepare($retrieveStudentQuery);
+        $stmtRetrieveStudent->bind_param("s", $stud_id);
+        $stmtRetrieveStudent->execute();
+        $stmtRetrieveStudent->bind_result($sid,$aname, $lname, $mob);
+        $stmtRetrieveStudent->fetch();
+        $stmtRetrieveStudent->close();
+        
         $response['success'] = true;
         $response['message'] = "Login successful!";
         $response['token'] = $token;
+        $response['student_details'] = array(
+            "sid"=> $sid,
+            "aname" => $aname,
+            "lname" => $lname,
+            "mob" => $mob
+        );
     } else {
         $response['success'] = false;
         $response['message'] = "Login failed.";
