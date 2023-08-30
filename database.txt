@@ -29,3 +29,8 @@ id int AI PK
 stud_id varchar(45) 
 password varchar(45) 
 token varchar(45)
+-----------------------------------------------------------------------------------4
+6)stud_book_map
+id int AI PK 
+stud_id int 
+book_id int
